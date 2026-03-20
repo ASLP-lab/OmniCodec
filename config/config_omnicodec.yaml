@@ -1,0 +1,109 @@
+
+train:
+  gradient_accumulation_steps: 2
+  epochs: 1000
+  save_dir: ./exps/omnicodec
+  log_interval: 100
+  eval_interval: 5000
+  learning_rate: 1.0e-4
+  training_steps: 2000000
+  betas: [0.8, 0.99]
+  eps: 1.0e-6
+  start_wd_step: 0
+  start_dacd_step: 0
+  hop_size: 300
+  batch_size: 6
+  devices: 1
+  seed: 3333
+  num_workers: 4
+
+data:
+  sample_rate: &sample_rate 24000
+  speech_train_shards_dir: # TODO
+  music_train_shards_dir: # TODO
+  sound_train_shards_dir: # TODO
+  segment_size: 240000 # 切片10秒，transformer的感受野很大
+ 
+model:
+  sample_rate: *sample_rate
+  frame_rate: 12.5
+  q_dimension: &q_dim 256
+  semantic_dimension: &semantic_dim 1024
+  seanet:
+    channels: 1
+    dimension: &dim 512
+    causal: True
+    n_filters: 64
+    n_residual_layers: 2
+    activation: ELU
+    compress: 2
+    dilation_base: 2
+    disable_norm_outer_blocks: 0
+    kernel_size: 7
+    residual_kernel_size: 3
+    last_kernel_size: 3
+    norm: none
+    pad_mode: constant
+    ratios: [8, 6, 5, 4]
+    true_skip: True
+
+  semantic_quantizer:
+    ema_new: false
+    dim: 512
+    codebook_size: 2048
+    codebook_dim: 1024
+
+  acoustic_quantizer:
+    dimension: 256
+    n_q: 32
+    bins: 2048 # codebook size 
+    input_dimension: 512
+    output_dimension: 512
+    q_dropout: true
+    ema_new: false
+
+  transformer:
+    d_model: *dim
+    num_heads: 8
+    num_layers: 8
+    causal: True
+    layer_scale: 0.01
+    context: 250
+    conv_layout: True
+    max_period: 10000
+    gating: none
+    norm: layer_norm
+    positional_embedding: rope
+    dim_feedforward: 2048
+    input_dimension: *dim
+    output_dimensions: [*dim]
+  
+  msstftd:
+    in_channels: 1
+    out_channels: 1
+    filters: 32
+    norm: weight_norm
+    n_ffts: [206, 334, 542, 876, 1418, 2296]
+    hop_lengths: [103, 167, 271, 438, 709, 1148]
+    win_lengths: [206, 334, 542, 876, 1418, 2296]
+    activation: LeakyReLU
+    activation_params: {negative_slope: 0.3}
+
+  msspec:
+    sample_rate: *sample_rate
+
+  dacd:
+    channels: 1
+    fft_sizes: [334, 542, 876, 1418, 2296]
+    sample_rate: *sample_rate
+    
+  wavlmdis:
+    slm_hidden: 768
+    slm_layers: 13
+    initial_channel: 64
+
+  wavlmloss:
+    model_sr: *sample_rate
+    ckpt_path: "pretrain_model/ssl/wavlm-base-plus" # for discrimintor
+
+wav_lm_model: "pretrain_model/ssl/wavlm_model/wavlm" # for distill
