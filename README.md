@@ -5,6 +5,7 @@ OmniCodec: Low Frame Rate Universal Audio Codec with Semantic–Acoustic Disenta
 <p align="center">
   <img src="assets/imgs/omnicodec.png" alt="OmniCodec" width="85%"/>
 </p>
+
 - Demo Page: [OmniCodec Demo Page](https://hujingbin1.github.io/OmniCodec-Demo-Page/)
 - Huggingface: [Huggingface](https://huggingface.co/ASLP-lab/OmniCodec)
 - Arxiv: [Arxiv](https://arxiv.org/html/2603.20638v1)
@@ -132,7 +133,15 @@ Outputs will be written to:
 
 ## Acknowledgements
 
-This codebase builds on ideas and components from modern neural audio codecs (e.g., SEANet-style backbones, multi-codebook RVQ, adversarial training) and self-supervised perception (e.g., WavLM), as discussed in the [OmniCodec paper](https://arxiv.org/html/2603.20638v1).
+- This repo benefits from [moshi](https://github.com/kyutai-labs/moshi)
+
+- This repo benefits from [Qwen3Omni](https://github.com/QwenLM/Qwen3-Omni)
+
+- This repo benefits from [DAC](https://github.com/descriptinc/descript-audio-codec)
+
+- This repo benefits from [BigVGAN](https://github.com/NVIDIA/BigVGAN)
+
+- This repo benefits from [SpeechTokenizer] https://github.com/zhangxinfd/speechtokenizer
 
 ## Citation
 
@@ -149,8 +158,6 @@ If you use this work, please cite:
       url={https://arxiv.org/abs/2603.20638}, 
 }
 ```
-
-The author list above is taken from the arXiv HTML front matter; if your toolchain requires the exact publisher metadata, please copy the official BibTeX from [arXiv](https://arxiv.org/abs/2603.20638) after it is available.
 
 ## License
 
