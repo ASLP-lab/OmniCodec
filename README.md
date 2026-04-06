@@ -136,14 +136,14 @@ This codebase builds on ideas and components from modern neural audio codecs (e.
 If you use this work, please cite:
 
 ```bibtex
-@misc{omnicodec2026,
-  title={OmniCodec: Low Frame Rate Universal Audio Codec with Semantic-Acoustic Disentanglement},
-  author={Hu, Jingbin and Haoyu, Che and Dake, Guo and Qirui, Li and Wenhao, Xie and Huakang, Wang and Guobin, Xie and Hanke, Zhang and Chengyou, Li and Pengyuan, Xie and Chuan, Xie and Qiang, Lei},
-  year={2026},
-  eprint={2603.20638},
-  archivePrefix={arXiv},
-  primaryClass={eess.AS},
-  url={https://arxiv.org/abs/2603.20638},
+@misc{hu2026omnicodeclowframerate,
+      title={OmniCodec: Low Frame Rate Universal Audio Codec with Semantic-Acoustic Disentanglement}, 
+      author={Jingbin Hu and Haoyu Zhang and Dake Guo and Qirui Zhan and Wenhao Li and Huakang Chen and Guobin Ma and Hanke Xie and Chengyou Wang and Pengyuan Xie and Chuan Xie and Qiang Zhang and Lei Xie},
+      year={2026},
+      eprint={2603.20638},
+      archivePrefix={arXiv},
+      primaryClass={eess.AS},
+      url={https://arxiv.org/abs/2603.20638}, 
 }
 ```
 
