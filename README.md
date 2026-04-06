@@ -11,7 +11,7 @@ OmniCodec: Low Frame Rate Universal Audio Codec with Semantic–Acoustic Disenta
 
 This repo contains:
 
-- **Training**: `train.py` (Accelerate + GAN losses + WavLM distillation)
+- **Training**: `train.py` (Accelerate + GAN / WavLM-related losses per config)
 - **Dataset**: `dataset.py` (multi-domain mixing; loads audio paths from `scp`)
 - **Inference**: `infer.py` (reconstructs audio with a pretrained checkpoint)
 - **Config**: `config/config_omnicodec.yaml`
@@ -129,7 +129,25 @@ Outputs will be written to:
 
 ## Acknowledgements
 
-This codebase builds on common components from modern neural audio codecs, adversarial training, and SSL-based perceptual/distillation losses.
+This codebase builds on ideas and components from modern neural audio codecs (e.g., SEANet-style backbones, multi-codebook RVQ, adversarial training) and self-supervised perception (e.g., WavLM), as discussed in the [OmniCodec paper](https://arxiv.org/html/2603.20638v1).
+
+## Citation
+
+If you use this work, please cite:
+
+```bibtex
+@misc{omnicodec2026,
+  title={OmniCodec: Low Frame Rate Universal Audio Codec with Semantic-Acoustic Disentanglement},
+  author={Hu, Jingbin and Haoyu, Che and Dake, Guo and Qirui, Li and Wenhao, Xie and Huakang, Wang and Guobin, Xie and Hanke, Zhang and Chengyou, Li and Pengyuan, Xie and Chuan, Xie and Qiang, Lei},
+  year={2026},
+  eprint={2603.20638},
+  archivePrefix={arXiv},
+  primaryClass={eess.AS},
+  url={https://arxiv.org/abs/2603.20638},
+}
+```
+
+The author list above is taken from the arXiv HTML front matter; if your toolchain requires the exact publisher metadata, please copy the official BibTeX from [arXiv](https://arxiv.org/abs/2603.20638) after it is available.
 
 ## License
 
