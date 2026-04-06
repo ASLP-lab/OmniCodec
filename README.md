@@ -134,14 +134,10 @@ Outputs will be written to:
 ## Acknowledgements
 
 - This repo benefits from [moshi](https://github.com/kyutai-labs/moshi)
-
 - This repo benefits from [Qwen3Omni](https://github.com/QwenLM/Qwen3-Omni)
-
 - This repo benefits from [DAC](https://github.com/descriptinc/descript-audio-codec)
-
 - This repo benefits from [BigVGAN](https://github.com/NVIDIA/BigVGAN)
-
-- This repo benefits from [SpeechTokenizer] https://github.com/zhangxinfd/speechtokenizer
+- This repo benefits from [SpeechTokenizer](https://github.com/zhangxinfd/speechtokenizer)
 
 ## Citation
 
