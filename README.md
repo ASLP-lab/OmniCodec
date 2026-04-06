@@ -3,7 +3,7 @@
 OmniCodec: Low Frame Rate Universal Audio Codec with Semantic–Acoustic Disentanglement
 
 <p align="center">
-  <img src="assets/teaser.png" alt="OmniCodec teaser" width="85%"/>
+  <img src="assets/imgs/omnicodec.png" alt="OmniCodec" width="85%"/>
 </p>
 - Demo Page: [OmniCodec Demo Page](https://hujingbin1.github.io/OmniCodec-Demo-Page/)
 - Huggingface: [Huggingface](https://huggingface.co/ASLP-lab/OmniCodec)
