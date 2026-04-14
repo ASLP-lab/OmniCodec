@@ -34,7 +34,7 @@ model:
     dimension: &dim 512
     causal: True
     n_filters: 64
-    n_residual_layers: 2
+    n_residual_layers: 4
     activation: ELU
     compress: 2
     dilation_base: 2
