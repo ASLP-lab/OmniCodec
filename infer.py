@@ -19,7 +19,7 @@ net_g = build_model(
        hps.model.acoustic_quantizer
 ).to(device)
 exp_name = "omnicodec"
-ckpt = torch.load(f'pretrained_model/omnicodec.pth',map_location='cpu')['model']
+ckpt = torch.load(f'pretrained_model/omnicodec.pth',map_location='cpu')
 net_g.load_state_dict(ckpt,strict=False)
 net_g.eval()
 
