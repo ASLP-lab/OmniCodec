@@ -165,16 +165,21 @@ class OmniCodecModel(CompressionModel[_MimiState]):
         self.decoder_transformer = decoder_transformer
         
         # TODO：需要提前下载预训练的Aut Encoder，后续更新到infer代码
-        self.model_id = "pretrain_model/Qwen/Aut_Encoder"
+        self.model_id = "ckpt/pretrain_model/Qwen3AuTEncoder"
         self.feature_extractor = WhisperFeatureExtractor.from_pretrained(self.model_id)
         self.qwen_encoder = Qwen3OmniMoeAudioEncoder.from_pretrained(self.model_id, dtype=torch.bfloat16).eval()
         for p in self.qwen_encoder.parameters():
             p.requires_grad = False
             
-        self.proj_qwen2se_emb = nn.Linear(2048, 512) 
-        self.proj_se_quant2ac_emb = nn.Linear(512, 512) 
-        self.proj_se_quant2ac_quant = nn.Linear(512, 512)
-        self.proj_se_quant2qwen = nn.Linear(512, 2048)
+        # self.proj_qwen2se_emb = nn.Linear(2048, 512) 
+        # self.proj_se_quant2ac_emb = nn.Linear(512, 512) 
+        # self.proj_se_quant2ac_quant = nn.Linear(512, 512)
+        # self.proj_se_quant2qwen = nn.Linear(512, 2048)
+        self.proj_gt_se_emb = nn.Linear(2048, 512) 
+        self.proj_se_q_ac_emb = nn.Linear(512, 512) 
+        self.proj_se_q_ac_q = nn.Linear(512, 512)
+        self.proj_se_q_gt = nn.Linear(512, 2048)
+        
         self.proj_wavlm = nn.Linear(512, 768)
         
         
@@ -389,7 +394,7 @@ class OmniCodecModel(CompressionModel[_MimiState]):
             expected_length,
         )
 
-        latent = self.proj_qwen2se_emb(hid_batch)
+        latent = self.proj_gt_se_emb(hid_batch)
         (latent,) = self.semantic_encoder(latent.transpose(1,2))
         latent = F.interpolate(latent, size=emb.shape[-1], mode='linear')
         q_semantic = self.semantic_quantizer(latent)
@@ -397,16 +402,18 @@ class OmniCodecModel(CompressionModel[_MimiState]):
         semantic_features = self.proj_wavlm(q_semantic_inter.transpose(1,2)).transpose(1,2)
         
         # ac rvq量化前， se vq 量化后的adapter
-        se_q = self.proj_se_quant2ac_emb(q_semantic_inter.transpose(1,2)).transpose(1,2)
+        se_q = self.proj_se_q_ac_emb(q_semantic_inter.transpose(1,2)).transpose(1,2)
         
         # ac rvq量化后， se vq 量化后的adapter
-        se_q_2 = self.proj_se_quant2ac_quant(q_semantic_inter.transpose(1,2)).transpose(1,2)
+        se_q_2 = self.proj_se_q_ac_q(q_semantic_inter.transpose(1,2)).transpose(1,2)
         
         guide_ac_latent = emb # guide_ac_latent，解偶前的
         
         ac_emb = emb - se_q 
         q_acoustic = self.acoustic_quantizer(ac_emb, self.frame_rate)
+        
         emb = q_acoustic.x + se_q_2
+        # emb = se_q_2
         
         emb = self._to_encoder_framerate(emb)
         guide_ac_latent = F.interpolate(guide_ac_latent, size=emb.shape[-1], mode='linear')
@@ -414,7 +421,7 @@ class OmniCodecModel(CompressionModel[_MimiState]):
         # 上采样到25hz后过transformer
         (semantic_feats_hat,) = self.semantic_decoder(emb)
         semantic_feats_hat = F.interpolate(semantic_feats_hat, size=hid_batch.shape[1], mode='linear')
-        semantic_feats_hat = self.proj_se_quant2qwen(semantic_feats_hat.transpose(1,2))
+        semantic_feats_hat = self.proj_se_q_gt(semantic_feats_hat.transpose(1,2))
         semantic_loss = self.semantic_l1(semantic_feats_hat, hid_batch)
         
         if self.decoder_transformer is not None:
@@ -435,6 +442,21 @@ class OmniCodecModel(CompressionModel[_MimiState]):
         q_acoustic.metrics.update(extra_metrics)
         return q_semantic, q_acoustic, semantic_loss, semantic_features, acoustic_guide_l1_loss
 
+    def decode_semantic(self, x: torch.Tensor) -> QuantizedResult:
+        q_semantic = self.semantic_quantizer.decode(x)
+        # ac rvq量化后， se vq 量化后的adapter
+        se_q_2 = self.proj_se_quant2ac_quant(q_semantic.transpose(1,2)).transpose(1,2)
+        emb = se_q_2
+        emb = self._to_encoder_framerate(emb)
+        
+        if self.decoder_transformer is not None:
+            (emb,) = self.decoder_transformer(emb)
+
+        with self._context_for_encoder_decoder:
+            out = self.decoder(emb)
+            
+        return out
+    
     def _encode_to_unquantized_latent(self, x: torch.Tensor) -> torch.Tensor:
         """Projects a batch of waveforms to unquantized latent space.
 
