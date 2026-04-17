@@ -21,6 +21,4 @@ from .conv import (
 )
 from .seanet import SEANetEncoder, SEANetDecoder
 from .transformer import StreamingTransformer
-from .modded_dac import WindowLimitedTransformer, Decoder
-from .rvq import CausalTransConvNet, ConvNeXtBlock
 from .layers import Snake1d, WNConv1d, WNConvTranspose1d
