@@ -445,7 +445,7 @@ class OmniCodecModel(CompressionModel[_MimiState]):
     def decode_semantic(self, x: torch.Tensor) -> QuantizedResult:
         q_semantic = self.semantic_quantizer.decode(x)
         # ac rvq量化后， se vq 量化后的adapter
-        se_q_2 = self.proj_se_quant2ac_quant(q_semantic.transpose(1,2)).transpose(1,2)
+        se_q_2 = self.proj_se_q_ac_q(q_semantic.transpose(1,2)).transpose(1,2)
         emb = se_q_2
         emb = self._to_encoder_framerate(emb)
         
@@ -537,17 +537,17 @@ class OmniCodecModel(CompressionModel[_MimiState]):
             expected_length,
         )
 
-        latent = self.proj_qwen2se_emb(hid_batch)
+        latent = self.proj_gt_se_emb(hid_batch)
         (latent,) = self.semantic_encoder(latent.transpose(1,2))
         latent = F.interpolate(latent, size=emb.shape[-1], mode='linear')
         q_semantic = self.semantic_quantizer(latent)
         q_semantic_inter = q_semantic.quantized
         
         # ac rvq量化前 se vq 量化后的adapter
-        se_q = self.proj_se_quant2ac_emb(q_semantic_inter.transpose(1,2)).transpose(1,2)
+        se_q = self.proj_se_q_ac_emb(q_semantic_inter.transpose(1,2)).transpose(1,2)
         
         # ac rvq量化后 se vq 量化后的adapter
-        se_q_2 = self.proj_se_quant2ac_quant(q_semantic_inter.transpose(1,2)).transpose(1,2)
+        se_q_2 = self.proj_se_q_ac_q(q_semantic_inter.transpose(1,2)).transpose(1,2)
         
         ac_emb = emb - se_q 
         q_acoustic = self.acoustic_quantizer(ac_emb, self.frame_rate)
@@ -558,7 +558,7 @@ class OmniCodecModel(CompressionModel[_MimiState]):
     def get_wav(self, se: torch.Tensor, ac: torch.Tensor) -> QuantizedResult:
      
         q_semantic = self.semantic_quantizer.decode(se)
-        se_q_2 = self.proj_se_quant2ac_quant(q_semantic.transpose(1,2)).transpose(1,2)
+        se_q_2 = self.proj_se_q_ac_q(q_semantic.transpose(1,2)).transpose(1,2)
         
         q_acoustic = self.acoustic_quantizer.decode(ac)
         emb = q_acoustic + se_q_2
